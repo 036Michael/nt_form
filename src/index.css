@@ -1,0 +1,28 @@
+.dividerToggle {
+    text-align: center;
+    position: relative;
+}
+
+.dividerToggle > :first-child {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+table {
+    font-size: 1.1rem;
+}
+
+.ant-table-column-title {
+    padding-left: 20px;
+}
+
+/* .groupOptions {
+    position: absolute;
+    background-color: #fff;
+    padding: 30px 10px 0px;
+    z-index: 2;
+    border-radius: 20px;
+    box-shadow: 0px 0px 2px 0px #000000;
+    top: 7;
+} */
