@@ -39,8 +39,7 @@ const MandarinVer = () => {
     const searchInput = useRef<InputRef>(null);
     const [messageApi, contextHolder] = message.useMessage();
     const [pagination, setPagination] = useState<number | undefined>(undefined);
-    const [searchSelect, setfilterSelect] = useState(true);
-
+    
     const [filteredInfo, setFilteredInfo] = useState<Filters>({
         fd_formStatus: ["在途", "暫存"],
     });
