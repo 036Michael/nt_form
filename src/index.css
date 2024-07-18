@@ -1,28 +1,29 @@
-.dividerToggle {
-    text-align: center;
-    position: relative;
-}
-
-.dividerToggle > :first-child {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
+.ant-table-column-title {
+    padding-left: 26px;
 }
 
 table {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
-.ant-table-column-title {
-    padding-left: 20px;
+.searchPopover {
+    display: none;
 }
 
-/* .groupOptions {
-    position: absolute;
-    background-color: #fff;
-    padding: 30px 10px 0px;
-    z-index: 2;
-    border-radius: 20px;
-    box-shadow: 0px 0px 2px 0px #000000;
-    top: 7;
-} */
+@media screen and (max-width: 430px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    h2 {
+        font-size: 1rem;
+    }
+
+    .ant-table table {
+        font-size: 0.8rem;
+        /* max-width: 100%; */
+    }
+    table {
+        font-size: 0.9rem;
+        /* max-width: 100%; */
+    }
+}

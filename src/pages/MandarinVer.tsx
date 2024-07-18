@@ -1,27 +1,35 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Button, Input, Space, Table, Divider, Switch, Empty } from "antd";
-import { DownOutlined, SearchOutlined, UpOutlined } from "@ant-design/icons";
+import {
+    Button,
+    Input,
+    Space,
+    Table,
+    Empty,
+    Popover,
+    Flex,
+    ConfigProvider,
+    message,
+    FloatButton,
+} from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+import zhTW from "antd/lib/locale/zh_TW";
 import type { InputRef, TableColumnType, TableProps } from "antd";
-
-import useAxios from "axios-hooks";
 import type { FilterDropdownProps } from "antd/es/table/interface";
-
+import useAxios from "axios-hooks";
 import dayjs from "dayjs";
-import Highlighter from "react-highlight-words"; // 引入react-highlight-words庫
-import SearchForm from "./SearchForm";
+import Highlighter from "react-highlight-words";
 
-interface DataType {
-    fd_createTime: string;
-    fd_doneTime: string;
-    fd_formStatus: string;
-    fd_name: string;
-    fd_secNo: string;
-    fd_subject: string;
-    fd_wrkDeptFullName: string;
-    key: string;
-}
+// Components
+import MainNav from "../Components/MainNav";
+// types
+import { DataType } from "../configRender/types";
+
+type OnChange = NonNullable<TableProps<DataType>["onChange"]>;
+type Filters = Parameters<OnChange>[1];
 
 type DataIndex = keyof DataType;
+
+import { colorConfig } from "../configRender/colorConfig";
 
 const MandarinVer = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -29,7 +37,23 @@ const MandarinVer = () => {
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInput = useRef<InputRef>(null);
-    const [isToggled, setIsToggled] = useState<boolean>(false);
+    const [messageApi, contextHolder] = message.useMessage();
+    const [pagination, setPagination] = useState<number | undefined>(undefined);
+    const [searchSelect, setfilterSelect] = useState(true);
+
+    const [filteredInfo, setFilteredInfo] = useState<Filters>({
+        fd_formStatus: ["在途", "暫存"],
+    });
+
+    const handleChange: OnChange = (pagination, filters, sorter) => {
+        setPagination(pagination.current);
+        console.log("Various parameters", pagination, filters, sorter);
+        setFilteredInfo(filters);
+    };
+
+    const clearFilters = () => {
+        setFilteredInfo({});
+    };
 
     const getColumnSearchProps = <T extends DataIndex>(
         dataIndex: T
@@ -87,7 +111,10 @@ const MandarinVer = () => {
         ),
         filterIcon: (filtered: boolean) => (
             <SearchOutlined
-                style={{ color: filtered ? "#1677ff" : undefined }}
+                style={{
+                    color: filtered ? "#1677ff" : undefined,
+                    fontSize: "1.2rem",
+                }}
             />
         ),
         onFilter: (value, record) =>
@@ -116,13 +143,25 @@ const MandarinVer = () => {
     // 表格欄位設定
     const columns: TableProps<DataType>["columns"] = [
         {
+            title: "序",
+            width: "2%",
+            align: "center",
+            // 第二頁繼續編號不要變成1
+            render: (text, record, index) => {
+                if (pagination) {
+                    return index + 1 + (pagination - 1) * 10;
+                }
+
+                return index + 1;
+            },
+        },
+        {
             title: "起單日期",
             dataIndex: "fd_createTime",
             key: "fd_createTime",
-            width: "8%",
+            width: "5%",
             align: "center",
             defaultSortOrder: "descend",
-
             sorter: (a, b) =>
                 dayjs(a.fd_createTime).unix() - dayjs(b.fd_createTime).unix(),
         },
@@ -131,7 +170,8 @@ const MandarinVer = () => {
             dataIndex: "fd_name",
             key: "fd_name",
             align: "center",
-            width: "8%",
+            width: "5%",
+            filteredValue: filteredInfo.fd_name || null,
 
             ...getColumnSearchProps("fd_name"),
         },
@@ -139,9 +179,9 @@ const MandarinVer = () => {
             title: "承辦單位",
             dataIndex: "fd_wrkDeptFullName",
             key: "fd_wrkDeptFullName",
-            width: "15%",
+            width: "12%",
             align: "center",
-
+            filteredValue: filteredInfo.fd_wrkDeptFullName || null,
             ...getColumnSearchProps("fd_wrkDeptFullName"),
         },
         {
@@ -150,6 +190,7 @@ const MandarinVer = () => {
             key: "fd_subject",
             width: "15%",
             align: "center",
+            filteredValue: filteredInfo.fd_subject || null,
             ...getColumnSearchProps("fd_subject"),
         },
         {
@@ -157,19 +198,32 @@ const MandarinVer = () => {
             dataIndex: "fd_formStatus",
             key: "fd_formStatus",
             align: "center",
-            width: "7%",
-            defaultFilteredValue: ["在途"],
+            width: "5%",
+            filteredValue: filteredInfo.fd_formStatus || null,
             render: (status) => {
                 let color;
                 switch (status) {
                     case "在途":
-                        color = "orange";
+                    case "階層陳核":
+                        color = colorConfig["status"]["在途"];
+                        break;
+                    case "暫存":
+                    case "退文敘辦":
+                        color = colorConfig["status"]["暫存"];
+                        break;
+                    case "作廢":
+                        color = colorConfig["status"]["作廢"];
+                        break;
+                    case "主管核決":
+                        color = colorConfig["status"]["主管核決"];
+                        break;
+                    case "核決":
+                        color = colorConfig["status"]["核決"];
                         break;
                     default:
                         color = "black";
                         break;
                 }
-
                 return (
                     <span style={{ color }} key={status}>
                         {status}
@@ -179,21 +233,28 @@ const MandarinVer = () => {
             filters: [
                 { text: "在途", value: "在途" },
                 { text: "暫存", value: "暫存" },
+                { text: "階層陳核", value: "階層陳核" },
+                { text: "退文敘辦", value: "退文敘辦" },
+                { text: "主管核決", value: "主管核決" },
+                { text: "作廢", value: "作廢" },
+                { text: "核決", value: "核決" },
             ],
-            onFilter: (value, record) => record.fd_formStatus === value, // 使用外部定义的过滤函数
+            onFilter(value, record) {
+                return record.fd_formStatus === value;
+            },
         },
         {
             title: "表單序號",
             dataIndex: "fd_secNo",
             key: "fd_secNo",
-            width: "8%",
+            width: "10%",
             align: "center",
+            filteredValue: filteredInfo.fd_secNo || null,
             ...getColumnSearchProps("fd_secNo"),
             render: (text, record) => (
                 <a
                     onClick={() => {
                         console.log("表單序號點擊:", record.fd_secNo);
-                        // 這裡添加你的點擊處理邏輯
                     }}
                 >
                     <Highlighter
@@ -216,28 +277,38 @@ const MandarinVer = () => {
     });
 
     // api取回來的資料處理
-
     useEffect(() => {
         if (fetchedData) {
             if (fetchedData.data.length > 0) {
                 setData(fetchedData.data);
+
+                // success();
+            } else {
+                console.log("no data");
+                setData([]);
+                warning();
             }
-        } else {
-            console.log("no data");
-            setData([]);
         }
     }, [fetchedData]);
 
-    const handleChidrenData = (searchData: any) => {
+    // 搜尋表單處理
+    const handleChidrenData = (searchData: any, values: any) => {
         const { message, data } = searchData.data;
+        setPagination(1); // 重置頁數
         if (message === "success") {
-            // sortDataFn(data.data);
             console.log("搜尋到的資料：", data);
+
             setData(data);
+            clearFilters();
+            successSearch();
         } else if (message === "fail") {
             console.log("查無資料");
+            warning();
             setData([]);
         }
+
+        // Highlight
+        console.log("搜尋到的值：", values);
     };
 
     const handleReset = (clearFilters: () => void, confirm: () => void) => {
@@ -256,9 +327,32 @@ const MandarinVer = () => {
         setSearchedColumn(dataIndex);
     };
 
-    const handleToggle = (checked: boolean) => {
-        setIsToggled(checked);
+    const errorMessage = () => {
+        messageApi.open({
+            type: "error",
+            content: `${error}`,
+        });
     };
+
+    const successSearch = () => {
+        messageApi.open({
+            type: "success",
+            content: `成功取得資料`,
+        });
+    };
+
+    const warning = () => {
+        messageApi.open({
+            type: "warning",
+            content: "查無資料",
+        });
+    };
+
+    useEffect(() => {
+        if (error) {
+            errorMessage();
+        }
+    });
 
     const locale = {
         emptyText: (
@@ -271,69 +365,75 @@ const MandarinVer = () => {
 
     return (
         <div>
-            {error && <p>取得資料時發生錯誤</p>}
+            {contextHolder}
 
-            <div className="dividerToggle">
-                <div>
-                    <span>功能選項 </span>
-                    <Switch
-                        checked={isToggled}
-                        onChange={handleToggle}
-                        checkedChildren="開啟"
-                        unCheckedChildren="關閉"
-                        defaultChecked
-                    />
-                </div>
+            <MainNav handleChidrenData={handleChidrenData} data={data} />
 
-                <Divider plain>
-                    {isToggled ? <DownOutlined /> : <UpOutlined />}
-                </Divider>
-                {isToggled && (
-                    <div className="groupOptions">
-                        <SearchForm handleChidrenData={handleChidrenData} />
-                    </div>
-                )}
-            </div>
-
-            <Space style={{ marginBottom: "1rem" }}>
-                <h2>選項總計：{selectedRowKeys.length}</h2>
-            </Space>
-
-            <Table
-                columns={columns}
-                dataSource={data}
-                loading={loading}
-                locale={locale}
-                pagination={{ pageSize: 10, position: ["bottomCenter"] }}
-                bordered
-                size="middle"
-                rowSelection={{
-                    selectedRowKeys,
-                    onChange: (keys) => setSelectedRowKeys(keys),
-                    type: "checkbox",
-                    columnWidth: "3%",
-                    selections: [
-                        Table.SELECTION_NONE,
-                        Table.SELECTION_ALL,
-                        Table.SELECTION_INVERT,
-                        {
-                            key: "today",
-                            text: "選擇今天",
-                            onSelect: () => {
-                                const today = dayjs().format("YYYY-MM-DD");
-                                setSelectedRowKeys(
-                                    data
-                                        .filter(
-                                            (item) =>
-                                                item.fd_createTime === today
-                                        )
-                                        .map((item) => item.key)
-                                );
-                            },
-                        },
-                    ],
+            <FloatButton
+                icon={<SearchOutlined />}
+                type="primary"
+                onClick={() => {
+                    console.log("click");
                 }}
             />
+
+            <ConfigProvider locale={zhTW}>
+                <Table
+                    onChange={handleChange}
+                    tableLayout="fixed"
+                    columns={columns}
+                    dataSource={data}
+                    loading={loading}
+                    locale={locale}
+                    pagination={{
+                        pageSize: 10,
+                        position: ["bottomCenter"],
+                        current: pagination,
+                    }}
+                    bordered
+                    size="middle"
+                    rowSelection={{
+                        selectedRowKeys,
+                        onChange: (keys) => setSelectedRowKeys(keys),
+                        type: "checkbox",
+                        columnWidth: "3%",
+                        selections: [
+                            Table.SELECTION_NONE,
+                            Table.SELECTION_INVERT,
+                            {
+                                key: "today",
+                                text: "選擇今天",
+                                onSelect: () => {
+                                    const today = dayjs().format("YYYY-MM-DD");
+                                    setSelectedRowKeys(
+                                        data
+                                            .filter(
+                                                (item) =>
+                                                    item.fd_createTime === today
+                                            )
+                                            .map((item) => item.key)
+                                    );
+                                },
+                            },
+                            {
+                                key: "today",
+                                text: "選擇在途",
+                                onSelect: () => {
+                                    setSelectedRowKeys(
+                                        data
+                                            .filter(
+                                                (item) =>
+                                                    item.fd_formStatus ===
+                                                    "在途"
+                                            )
+                                            .map((item) => item.key)
+                                    );
+                                },
+                            },
+                        ],
+                    }}
+                />
+            </ConfigProvider>
         </div>
     );
 };

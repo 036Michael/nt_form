@@ -1,0 +1,30 @@
+/* table {
+    text-align: center;
+}
+
+table thead tr {
+    background-color: rgb(63, 63, 85);
+}
+
+table th {
+    border: 1px solid black;
+    padding: 8px;
+    cursor: pointer;
+}
+
+table tbody tr {
+    background-color: #b7b7b7;
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #d5d5d5;
+}
+
+table tbody tr td {
+    border: 1px solid black;
+    padding: 8px;
+}
+
+.table-row:hover {
+    opacity: 0.8;
+} */

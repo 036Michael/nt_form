@@ -27,7 +27,7 @@ body {
         justify-content: space-between;
 
         > * {
-            margin: 0 20px;
+            margin: 0 40px;
         }
 
         .logo {
@@ -36,21 +36,38 @@ body {
             align-items: center;
             color: white;
             font-size: 2.2rem;
+            cursor: pointer;
+            a {
+                color: white;
+                text-decoration: none;
+            }
         }
 
         .nav {
             display: flex;
+            align-items: center;
 
-            a {
-                color: white;
-                font-size: 1.5rem;
-                padding: 20px;
-                text-decoration: none;
-            }
+            ul {
+                display: flex;
+                align-items: center;
+                list-style: none;
+                li {
+                    margin: 15px 0px;
+                    a {
+                        padding: 25px 10px;
+                        color: #dfefff;
+                        text-decoration: none;
+                        font-size: 1.5rem;
+                    }
 
-            :hover {
-                transition: 0.3s;
-                background-color: #2587ff;
+                    :hover {
+                        background-color: #1569e6;
+                        transition: all 0.3s;
+                    }
+                    .active {
+                        background-color: #1569e6;
+                    }
+                }
             }
         }
     }
@@ -80,6 +97,14 @@ body {
                 margin: 0;
                 padding: 10px;
             }
+        }
+    }
+}
+
+@media screen and (max-width: 431px) {
+    .wrapper {
+        main {
+            padding: 1rem;
         }
     }
 }
