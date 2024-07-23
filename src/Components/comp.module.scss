@@ -7,15 +7,15 @@
 }
 
 .searchForm {
-    padding: 20px;
+    padding: 20px 20px 0px 20px;
     text-align: center;
 }
 
 .btnGroup > * {
     // padding: 5px 20px;
-    width: 100px;
+    // width: 100px;
     font-size: 1.2rem;
-    margin: 0px 10px;
+    margin: 0px 5px;
 }
 
 @media screen and (max-width: 430px) {

@@ -19,20 +19,35 @@ import zhTW from "antd/locale/zh_TW";
 function App() {
     const [data, setData] = useState([]);
 
-    // const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-
     useEffect(() => {
         axios.get("/api/getNtFormData").then((res) => {
             setData(res.data.data);
-            setLoading(false);
         });
     }, []);
 
     return (
         <>
-            {loading && <div>Loading...</div>}
-            <ConfigProvider locale={zhTW}>
+            <ConfigProvider
+                locale={zhTW}
+                theme={{
+                    components: {
+                        Form: {},
+                        Table: {
+                            borderRadiusOuter: 10,
+                            borderColor: "#dddddd",
+                        },
+                        Button: {
+                            paddingContentHorizontal: 28,
+                            paddingContentVertical: 20,
+                        },
+                    },
+
+                    token: {
+                        fontSize: 22,
+                        // paddingContentHorizontal: 28,
+                    },
+                }}
+            >
                 <Router>
                     <Layout>
                         <Routes>
@@ -56,7 +71,7 @@ function App() {
                         </Routes>
                     </Layout>
                 </Router>
-            </ConfigProvider>{" "}
+            </ConfigProvider>
         </>
     );
 }

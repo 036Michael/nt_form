@@ -1,29 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .ant-table-column-title {
     padding-left: 26px;
 }
 
-table {
-    font-size: 1.2rem;
-}
-
-.searchPopover {
-    display: none;
+.main-nav {
+    display: flex;
+    justify-content: space-between;
 }
 
 @media screen and (max-width: 430px) {
-    h1 {
-        font-size: 1.5rem;
-    }
-    h2 {
-        font-size: 1rem;
+    .ant-table-column-title {
+        padding-left: 0;
     }
 
-    .ant-table table {
-        font-size: 0.8rem;
-        /* max-width: 100%; */
-    }
-    table {
-        font-size: 0.9rem;
-        /* max-width: 100%; */
+    main {
+        .main-nav {
+            display: block;
+        }
     }
 }

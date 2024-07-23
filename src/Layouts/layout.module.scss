@@ -86,11 +86,11 @@ body {
         flex-direction: column;
         align-items: center;
 
-        div {
-            margin: 20px 0;
+        .nav {
+            margin: 0;
         }
 
-        nav ul {
+        .nav ul {
             flex-direction: column;
 
             li {
@@ -103,6 +103,28 @@ body {
 
 @media screen and (max-width: 431px) {
     .wrapper {
+        .header {
+            flex-direction: column;
+            align-items: center;
+
+            .nav {
+                margin: 10px 0;
+            }
+
+            .nav ul {
+                flex-direction: row;
+
+                li {
+                    margin: 0;
+                    padding: 10px;
+                    a {
+                        padding: 1rem;
+                        font-size: 1rem;
+                    }
+                }
+            }
+        }
+
         main {
             padding: 1rem;
         }
