@@ -35,7 +35,7 @@ export default function Columns({ pagination, filteredInfo }: ColumnsProps) {
             align: "center",
             key: "index",
             // 第二頁繼續編號不要變成1
-            render: (text, record, index) => {
+            render: (_, __, index) => {
                 if (pagination) {
                     return index + 1 + (pagination - 1) * 10;
                 }

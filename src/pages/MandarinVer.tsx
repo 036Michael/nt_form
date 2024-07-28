@@ -19,7 +19,7 @@ import { initialValues } from "@/Components/SearchForm";
 import Columns from "@/Components/Columns";
 import { TableLocale } from "antd/es/table/interface";
 import { CheckboxOptionType } from "antd/lib";
-import { SearchOutlined, SettingOutlined } from "@ant-design/icons";
+import { SettingOutlined } from "@ant-design/icons";
 
 /** --------------import end ---------------- */
 
@@ -78,7 +78,7 @@ const MandarinVer = () => {
             }
             if (error) {
                 alert("載入資料失敗！請聯繫資訊處管理人員！");
-                console.error(`error code ${error.response?.status}`, error);
+                // console.error(`error code ${error.response?.status}`, error);
                 setSpinning(false);
                 return;
             }

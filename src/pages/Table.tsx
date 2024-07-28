@@ -109,7 +109,7 @@ const Table: React.FC<TableProps> = ({ data: fetchedData }) => {
                             <td>{row.fd_formStatus}</td>
                             <td>
                                 <button
-                                    onClick={(row) => {
+                                    onClick={() => {
                                         sortedData.splice(index, 1);
                                         setSortedData([...sortedData]);
                                     }}
